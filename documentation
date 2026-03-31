@@ -1,1 +1,13 @@
 This will be helper for documenation
+
+Hugging Face Transformers vs Ollama - 
+Because I'm using google collab for this project I'll probably use hugging face transformers.
+Ollama is great for running models on your own laptop, but in Colab it causes headaches because it expects to manage its own server process.
+
+ChromaDB over Qdrant - 
+ChromaDB is simpler to set up in Colab with no external server needed
+Qdrant in its full form expects a running Docker container or a cloud instance, which would require workarounds
+Qdrant does have an in-memory Python client mode but then you lose the persistence advantage anyway* 
+(Qdrant može da radi brzo u Pythonu bez instalacije pravog servera, ali ako ga koristiš samo u memoriji (in-memory), on se ponaša kao obična promenljiva. Ako ti se Colab ugasi, 
+moraš ponovo da radiš ceo document ingestion i ponovo generišeš sve embeddinge)
+ChromaDB saves directly to Colab's local disk (or Google Drive) with almost no configuration
