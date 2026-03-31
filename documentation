@@ -11,3 +11,61 @@ Qdrant does have an in-memory Python client mode but then you lose the persisten
 (Qdrant može da radi brzo u Pythonu bez instalacije pravog servera, ali ako ga koristiš samo u memoriji (in-memory), on se ponaša kao obična promenljiva. Ako ti se Colab ugasi, 
 moraš ponovo da radiš ceo document ingestion i ponovo generišeš sve embeddinge)
 ChromaDB saves directly to Colab's local disk (or Google Drive) with almost no configuration
+
+CHUNKING
+
+1.Fixed Size Chunking - You just count characters or tokens and cut at a fixed number, with some overlap between chunks so you don't lose context at the boundaries.
+
+"The capybara is the largest rodent. It lives in South America. 
+ It is semi-aquatic. It weighs up to 65kg..."
+
+Chunk 1: "The capybara is the largest rodent. It lives in South America."
+Chunk 2: "It lives in South America. It is semi-aquatic."  ← overlap
+Chunk 3: "It is semi-aquatic. It weighs up to 65kg..."    ← overlap
+
+Pros: Simple, fast, predictable, easy to implement
+Cons: Completely ignores the meaning of the text. Can cut right in the middle of an important idea. A chunk might start mid-sentence or mid-topic.
+
+2. Recursive Character Splitting
+
+First try to split at:  \n\n  (paragraph breaks)
+If chunks still too big, split at:  \n  (line breaks)
+If still too big, split at:  .  (sentences)
+If still too big, split at:  " "  (words)
+As last resort, split at character level
+
+Document text: 
+"The capybara is the largest rodent in the world.
+
+It is native to South America. The capybara is a highly 
+social animal that lives in groups."
+
+Chunk 1: "The capybara is the largest rodent in the world."
+Chunk 2: "It is native to South America. The capybara is a highly social animal that lives in groups."
+
+Pros: Respects natural text boundaries, produces more coherent chunks than fixed size, still fast
+Cons: Still based on character counts, does not actually understand the meaning of the text
+
+3. Semantic Chunking -Instead of splitting based on character counts or punctuation, it splits based on meaning.
+
+Split the text into individual sentences first
+Embed each sentence into a vector
+Calculate the similarity between consecutive sentences
+When similarity drops significantly, that is a topic change — split there
+
+Sentence 1: "The capybara is the largest rodent."         similarity: 0.92 ← similar topic, keep together
+Sentence 2: "It can weigh up to 65 kilograms."            similarity: 0.89 ← similar topic, keep together  
+Sentence 3: "Capybaras live near water sources."          similarity: 0.45 ← BIG DROP, split here!
+Sentence 4: "They are found across South America."        similarity: 0.87 ← similar topic, keep together
+Sentence 5: "Countries include Brazil and Argentina."
+
+Pros: Produces the most meaningful and coherent chunks, each chunk tends to be about one specific topic
+Cons: Much slower because it needs to embed every sentence, requires an embedding model to run during chunking, more complex to implement
+
+Semantic — best quality chunks but slowest
+Recursive — good quality, fast, used most often in real projects
+Fixed size — lowest quality but simplest
+
+
+
+
