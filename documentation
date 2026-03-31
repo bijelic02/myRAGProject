@@ -1,5 +1,55 @@
 This will be helper for documenation
 
+Here's a clear breakdown of the project into development phases:
+Phase 1: Environment & Data Setup
+Set up the Colab environment by installing all dependencies (transformers, sentence-transformers, FAISS, ChromaDB, Gradio/Streamlit, rank-bm25, etc.). 
+Then collect your 10–20 documents on a chosen topic, store them with metadata (title, date, category, source), and write a simple ingestion script that loads and normalizes them.
+
+Phase 2: Chunking Strategy Research & Implementation
+Implement three chunking approaches — fixed-size (e.g., 256/512 tokens with overlap), recursive character splitting, and semantic chunking (splitting on embedding similarity drops). 
+Test each on your documents and document which produces the most coherent, retrievable chunks. Choose a winner for the main pipeline.
+
+Phase 3: Embedding Model Benchmarking
+Load at least two embedding models (e.g., all-MiniLM-L6-v2 and BAAI/bge-small-en-v1.5). Benchmark both on encoding speed, memory usage, and retrieval accuracy against a small hand-labeled test set. 
+Pick the better one and document your findings.
+
+Phase 4: Vector Store Setup
+Implement FAISS (in-memory) and ChromaDB (persistent) side by side. Index your chunks in both. Add metadata filtering support (by source, category, or date) to each. Compare query latency and persistence behavior.
+
+Phase 5: LLM Selection & Loading
+Research and choose a model under 3B parameters (e.g., Phi-3-mini, Qwen2-1.5B, or Gemma-2B). Load it via Hugging Face Transformers with 4-bit quantization (bitsandbytes) to fit in Colab's free GPU. 
+Write a justification note covering size, quality, and Colab compatibility.
+
+Phase 6: Baseline RAG Pipeline
+Wire everything together into a baseline pipeline: query → embed → retrieve top-k chunks → build a grounded prompt → generate answer. 
+Engineer the prompt carefully to keep the small LLM grounded (e.g., "Answer only using the context below. 
+If the answer is not in the context, say so."). Add a basic confidence indicator (e.g., based on retrieval similarity scores).
+
+Phase 7: Advanced Retrieval Techniques
+Implement at least three enhancements and compare each against the baseline. 
+Good choices are: hybrid search (BM25 + dense retrieval with score fusion), a cross-encoder re-ranker (cross-encoder/ms-marco-MiniLM-L-6-v2), 
+and query rewriting/expansion using your local LLM. For each, show a concrete example where it helps vs. the baseline.
+
+Phase 8: Evaluation Framework
+Build a test set of 20 Q&A pairs (15 answerable, 5 unanswerable). Write evaluation code that measures Precision@k, Recall@k, and MRR for retrieval, and correctness/groundedness/refusal rate for answers. 
+Use your local LLM as a judge (prompt it to score answer quality) or use rule-based scoring as a fallback. Run the full eval across all pipeline variants and produce a comparison table.
+
+Phase 9: Web UI
+Build a Gradio (or Streamlit) interface with a question input, answer output with source citations, and a confidence indicator. 
+Add an admin panel for adding/removing documents from the knowledge base and reindexing. Wire it up with Colab's tunneling (Gradio's share=True or ngrok).
+
+Phase 10: Bonus Features (Optional)
+These are worth doing if time allows: multi-turn conversation with a chat history buffer, streaming token output, PDF/HTML ingestion (using pypdf and beautifulsoup4), 
+and a query cache using semantic similarity to avoid re-running identical or near-identical questions.
+
+Phase 11: Documentation & Design Document
+Write the 1–2 page production design document covering: scaling to 1M+ documents (sharding, approximate nearest neighbor at scale), document lifecycle management (add/update/delete with re-indexing), 
+production monitoring metrics (latency, retrieval quality, hallucination rate), failure modes of small models, access control strategy, and self-hosting vs. API cost estimates.
+
+Phase 12: Final Cleanup & Deliverables
+Clean up the Colab notebook with clear section headers and comments, write a comparison summary of all your technology and technique choices, and package everything as either a single notebook or a linked GitHub repo with setup instructions.
+
+
 Hugging Face Transformers vs Ollama - 
 Because I'm using google collab for this project I'll probably use hugging face transformers.
 Ollama is great for running models on your own laptop, but in Colab it causes headaches because it expects to manage its own server process.
@@ -12,7 +62,7 @@ Qdrant does have an in-memory Python client mode but then you lose the persisten
 moraš ponovo da radiš ceo document ingestion i ponovo generišeš sve embeddinge)
 ChromaDB saves directly to Colab's local disk (or Google Drive) with almost no configuration
 
-CHUNKING
+PHASE 2 - CHUNKING
 
 1.Fixed Size Chunking - You just count characters or tokens and cut at a fixed number, with some overlap between chunks so you don't lose context at the boundaries.
 
@@ -67,5 +117,156 @@ Recursive — good quality, fast, used most often in real projects
 Fixed size — lowest quality but simplest
 
 
+PHASE 3 - EMBEDDING
+
+Most popular models are:
+Model                  Size   Speed       Quality     Memory
+all-MiniLM-L6-v2       22MB   Very Fast   Good        ~90MB
+BAAI/bge-small-en-v1.5 33MB   Fast        Very Good   ~130MB
+BAAI/bge-base-en-v1.5  109MB  Medium      Excellent   ~440MB
+thenlper/gte-small     67MB   Fast        Very Good   ~250MB
+intfloat/e5-small-v2   33MB   Fast        Very Good   ~130MB
+
+My choice for this project: all-MiniLM-L6-v2 vs BAAI/bge-small-en-v1.5
+
+Reasons:
+Both fit easily in Colab free tier memory
+Both are fast enough to benchmark fairly
+MiniLM is the most widely used baseline in RAG projects
+BGE-small consistently outperforms MiniLM on retrieval benchmarks while staying small
+Comparing these two gives a meaningful quality vs speed tradeoff story
+
+The one advantage MiniLM has is speed — it is slightly faster to encode since it has fewer parameters. But for a RAG system retrieval quality matters far more than a few milliseconds difference in encoding time.
+Decision: We will use BAAI/bge-small-en-v1.5 as our embedding model for the main pipeline.
+
+-we have visualisation of matrixes saved on drive
+
+PHASE 4 - VECTOR DATABASE
+
+FAISS (in-memory):
+
+Facebook AI Similarity Search
+Čuva sve vektore u RAM memoriji
+Izuzetno brz za pretragu
+Ali kada se Colab session završi, sve se briše
+Nema ugrađenu podršku za metadata filtering, moramo je dodati ručno
 
 
+ChromaDB (persistent):
+
+Čuva vektore na disku (Google Drive u našem slučaju)
+Malo sporiji od FAISS ali zanemarljivo
+Ima ugrađenu podršku za metadata filtering
+Podaci ostaju sačuvani između Colab sessiona
+Lakši za upravljanje dokumentima (dodavanje, brisanje)
+
+Detail plan for phase 4:
+1. Take chunks from Phase 2
+2. Embed them whit BGE model from Phase 3
+3. Load them into FAISS and ChromaDB
+4. Dodati metadata filtering u oba
+5. Change search speed 
+6. Compare results after session restart
+
+=== LATENCY COMPARISON ===
+
+                              Query |  FAISS (s) | ChromaDB (s)
+-----------------------------------------------------------------
+What is the largest rodent in the w |      0.011 |        0.014
+    How do beavers build their dams |      0.010 |        0.013
+     Where do chinchillas come from |      0.010 |        0.014
+    What do squirrels eat in winter |      0.013 |        0.015
+     Are rabbits considered rodents |      0.010 |        0.015
+-----------------------------------------------------------------
+                            Average |      0.011 |        0.014
+
+Faster vector store: FAISS
+
+Since we dont have many chunks we'll use ChromaDB, because I'm making this model in multiple sessions 
+and don't want to wait everitime for embedding all chunks.
+
+Phase 5 - LLM Selection & Loading
+Model               Parameters    Size on disk     Quality      Colab Compatible  
+Phi-3-mini          3.8B          ~8GB             Excellent   ⚠️Borderline
+Qwen2-1.5B          1.5B          ~3GB             Good✅       Yes
+Gemma-2B            2B            ~5GB             Very Good✅  Yes
+Phi-2               2.7B          ~6GB             Very Good✅  Yes
+TinyLlama-1.1B      1.1B          ~2GB             Decent✅     Yes
+
+My choice: Qwen2-1.5B-Instruct
+Reasons:
+
+Size — 1.5B parameters is small enough to fit comfortably in Colab free GPU (15GB) even without aggressive quantization. 
+With 4-bit quantization it uses roughly 1-2GB of GPU memory leaving plenty of room for embeddings and ChromaDB.
+
+Quality — Qwen2 consistently outperforms other models of similar size on benchmarks. 
+The Instruct version is fine-tuned to follow instructions which is critical for staying grounded in RAG context and not hallucinating.
+
+Colab compatibility — Unlike Phi-3-mini which is borderline on memory, Qwen2-1.5B loads reliably on free tier without OOM errors.
+
+Language following — Qwen2 is particularly good at following prompt instructions which matters a lot for our grounding prompt 
+where we tell the model to only answer from context.
+
+4-bit quanization
+What is quantization in general?
+Every number in a neural network (model weights) is stored with a certain precision. By default models use 32-bit or 16-bit floating point numbers.
+
+A model with 1.5 billion parameters means it has 1.5 billion numbers stored inside it. The storage size depends on precision
+Qwen2-1.5B in 32-bit = 1,500,000,000 × 4 bytes = 6 GB
+Qwen2-1.5B in 16-bit = 1,500,000,000 × 2 bytes = 3 GB
+Qwen2-1.5B in 4-bit  = 1,500,000,000 × 0.5 bytes = 0.75 GB
+
+Research has shown that 4-bit quantization loses only about 1-3% of model quality compared to full precision, 
+which is an acceptable tradeoff for being able to run the model at all.
+
+LLM Selection Justification
+For this project we selected Qwen2-1.5B-Instruct as our local language model.
+Size
+With 1.5 billion parameters, Qwen2-1.5B is small enough to fit comfortably within Colab's free tier GPU memory. Using 4-bit NF4 quantization via bitsandbytes the model occupies only 1-2GB of GPU memory, leaving sufficient room for the embedding model, ChromaDB vector store, and inference processing to run simultaneously without out-of-memory errors.
+Quality
+Qwen2 consistently outperforms other models of comparable size such as TinyLlama-1.1B on instruction following benchmarks. The Instruct variant is specifically fine-tuned to follow user instructions precisely, which is critical in a RAG system where the model must stay grounded in provided context and avoid hallucinating information that is not in the documents.
+Colab Compatibility
+Unlike Phi-3-mini which has 3.8 billion parameters and is borderline on free tier memory, Qwen2-1.5B loads reliably on a Colab T4 GPU without memory issues. Gemma-2B was also considered but Qwen2 showed better instruction following behavior in testing which is the most important factor for RAG applications.
+Quantization
+4-bit NF4 quantization reduces the model memory footprint by approximately 75% compared to full 16-bit precision with only minimal quality degradation of 1-3%. Computations are performed in float16 for accuracy while weights are stored in 4-bit, giving the best balance between memory efficiency and answer quality.
+
+Phase 6: Baseline RAG Pipeline
+
+RAG stands for Retrieval Augmented Generation. It is a technique that combines a retrieval system with a language model to produce answers that are grounded in a specific set of documents rather than relying solely on what the model learned during training.
+The pipeline works in three main steps. First, when a user asks a question, the question is converted into a vector using an embedding model and the most relevant chunks of text are retrieved from the vector store based on similarity. Second, those retrieved chunks are inserted into a carefully engineered prompt as context alongside the original question. Third, the language model reads that context and generates an answer based only on what was provided, not from its general knowledge.
+The key advantage of RAG over using a plain language model is accuracy and trustworthiness. Instead of the model guessing or hallucinating an answer from its training data, it reads the actual source documents and cites them. This makes it especially useful for domain specific applications
+
+
+Phase 7: Advanced Retrieval Techniques
+
+So for Phase 7 we only need to implement three new ones:
+✅ Hybrid search — BM25 + dense retrieval with score fusion
+    Right now our baseline only uses dense retrieval — meaning we embed the query and find similar vectors. 
+    BM25 is a completely different approach called sparse retrieval — it works like a classic search engine and looks for exact keyword matches.
+    Final score = (0.5 × dense score) + (0.5 × BM25 score)
+
+✅ Cross-encoder re-ranker — cross-encoder/ms-marco-MiniLM-L-6-v2
+
+    Our current retrieval uses a bi-encoder approach — we embed the query separately, embed chunks separately, and compare vectors. This is fast but not perfectly accurate because the query and chunk never actually see each other during scoring.
+    A cross-encoder works differently — it takes the query AND a chunk together and scores how relevant they are to each other as a pair:
+
+    We do not use cross-encoder for all chunks because it would be too slow
+
+✅ Query transformation — rewriting/expansion using Qwen
+
+   Sometimes users ask questions in a vague or poorly worded way. Query transformation uses the LLM to rewrite or expand the question before searching:
+
+   Rewriting — fix vague or badly worded queries:
+   "tell me about where they live" 
+   → "Where do capybaras live and what is their natural habitat?"
+
+   Expansion — add related terms to catch more relevant chunks:
+   "capybara size"
+   → "capybara size weight height dimensions largest rodent"
+
+  Hypothetical document generation — instead of searching with the question, generate what a perfect answer would look like and search with that:
+
+  Question: "How big is a capybara?"
+  → Generate: "A capybara typically weighs between 35 and 65 kilograms and measures about 1 meter in length"
+  → Search with this hypothetical answer instead of the question
+  → Finds chunks that look like answers, not questions
