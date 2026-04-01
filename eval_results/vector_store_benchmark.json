@@ -1,0 +1,14 @@
+{
+  "faiss": {
+    "type": "in-memory",
+    "vectors_stored": 632,
+    "persistence": "manual - must save and reload index file",
+    "metadata_filtering": "post-retrieval filtering"
+  },
+  "chromadb": {
+    "type": "persistent",
+    "vectors_stored": 632,
+    "persistence": "automatic - survives session restarts",
+    "metadata_filtering": "native - built in where clause"
+  }
+}

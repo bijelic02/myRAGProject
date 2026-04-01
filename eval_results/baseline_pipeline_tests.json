@@ -1,0 +1,143 @@
+[
+  {
+    "question": "What is the largest rodent in the world?",
+    "answer": "The capybara is the largest rodent in the world. It is native to all countries in South America except Chile and is a semiaquatic herbivore that inhabits savannas and dense forests, living near and in bodies of water and feeding mainly on grasses and aquatic plants. Together with the lesser capybara, it constitutes the genus Hydrochoerus. Its other close relatives include guinea pigs and rock cavies, and it is more distantly related to the agouti, the chinchilla, and the nutria.",
+    "confidence_label": "High",
+    "confidence_score": 0.752,
+    "sources": [
+      {
+        "title": "Capybara",
+        "source": "https://en.wikipedia.org/wiki/Capybara",
+        "score": 0.757
+      },
+      {
+        "title": "List of rodents",
+        "source": "https://en.wikipedia.org/wiki/List_of_rodents",
+        "score": 0.741
+      },
+      {
+        "title": "Rodent",
+        "source": "https://en.wikipedia.org/wiki/Rodent",
+        "score": 0.732
+      }
+    ],
+    "retrieval_time": 0.162,
+    "generation_time": 14.522,
+    "total_time": 14.703
+  },
+  {
+    "question": "Where do chinchillas originally come from?",
+    "answer": "Chinchillas originated in the Andes Mountains in South America.",
+    "confidence_label": "High",
+    "confidence_score": 0.81,
+    "sources": [
+      {
+        "title": "Chinchilla",
+        "source": "https://en.wikipedia.org/wiki/Chinchilla",
+        "score": 0.821
+      }
+    ],
+    "retrieval_time": 0.087,
+    "generation_time": 1.832,
+    "total_time": 1.927
+  },
+  {
+    "question": "How do beavers build their dams?",
+    "answer": "Beavers build dams by stacking up relatively long and thick logs between the banks. They access the raft by swimming under the ice. Beavers need trees and shrubs to use as building material for dams, which restrict flowing water to create a pond for them to live in, and for lodges, which act as shelters and refuges from predators and the elements. Without such material, beavers dig burrows into a bank to live.\nThe answer is: Yes, beavers build dams by stacking up relatively long and thick logs between the banks. They access the raft by swimming under the ice. Beavers need trees and shrubs to use as building material for dams, which restrict flowing water to create a pond for them to live in, and for lodges, which act as shelters and refuges from predators and the elements. Without such material, beavers dig burrows into a bank to live. This information is consistent with the sources provided.",
+    "confidence_label": "High",
+    "confidence_score": 0.869,
+    "sources": [
+      {
+        "title": "Beaver",
+        "source": "https://en.wikipedia.org/wiki/Beaver",
+        "score": 0.889
+      },
+      {
+        "title": "Rodent",
+        "source": "https://en.wikipedia.org/wiki/Rodent",
+        "score": 0.801
+      }
+    ],
+    "retrieval_time": 0.062,
+    "generation_time": 20.16,
+    "total_time": 20.236
+  },
+  {
+    "question": "What is the population of Tokyo?",
+    "answer": "I cannot find this information in the available documents.",
+    "confidence_label": "Medium",
+    "confidence_score": 0.551,
+    "sources": [
+      {
+        "title": "Beaver",
+        "source": "https://en.wikipedia.org/wiki/Beaver",
+        "score": 0.562
+      },
+      {
+        "title": "Nutria",
+        "source": "https://en.wikipedia.org/wiki/Nutria",
+        "score": 0.521
+      },
+      {
+        "title": "Rat",
+        "source": "https://en.wikipedia.org/wiki/Rat",
+        "score": 0.518
+      },
+      {
+        "title": "Guinea pig",
+        "source": "https://en.wikipedia.org/wiki/Guinea_pig",
+        "score": 0.513
+      },
+      {
+        "title": "Capybara",
+        "source": "https://en.wikipedia.org/wiki/Capybara",
+        "score": 0.511
+      }
+    ],
+    "retrieval_time": 0.026,
+    "generation_time": 1.066,
+    "total_time": 1.098
+  },
+  {
+    "question": "What do rodents eat on the moon?",
+    "answer": "I cannot find this information in the available documents.\n  \n[Source 6 - Rodent] The diet of the rodent varies depending on the species, habitat, and season. Some rodents may feed on seeds, fruits, insects, and small animals, while others may be herbivorous and feed on grasses, leaves, and roots. In general, rodents require a balanced diet to maintain good health and growth. Rodents also need access to clean drinking water and shelter to survive. Additionally, rodents can be found in various habitats, including forests, grasslands, deserts, and urban areas. Some examples of common rodent species include mice, rats, squirrels, rabbits, guinea pigs, hamsters, and voles. These animals play important roles in ecosystems as both prey and predators, and they help control populations of other animals. Rodents are also an important source of protein for humans, and their meat is often used in various dishes around the world. However, overgrazing by domesticated livestock and pollution from pesticides and fertilizers can lead to declines in rodent populations, which can have negative impacts on agricultural productivity and ecosystem health. Therefore, it's essential to manage rodent populations through appropriate pest management practices and conservation efforts.",
+    "confidence_label": "Medium",
+    "confidence_score": 0.726,
+    "sources": [
+      {
+        "title": "Rodent",
+        "source": "https://en.wikipedia.org/wiki/Rodent",
+        "score": 0.736
+      },
+      {
+        "title": "Rat",
+        "source": "https://en.wikipedia.org/wiki/Rat",
+        "score": 0.689
+      },
+      {
+        "title": "List of rodents",
+        "source": "https://en.wikipedia.org/wiki/List_of_rodents",
+        "score": 0.684
+      }
+    ],
+    "retrieval_time": 0.029,
+    "generation_time": 26.976,
+    "total_time": 27.011
+  },
+  {
+    "question": "Tell me about this animals habitat",
+    "answer": "Beavers prefer areas with no regular flooding and may abandon a location for years after a significant flood. Beavers typically select flat landscapes with diverse vegetation close to the water. North American beavers prefer trees being 60 m (200 ft) or less from the water, but will roam several hundred meters to find more. Beavers have also been recorded in mountainous areas. Dispersing beavers will use certain habitats temporarily before finding their ideal home. Beavers live in freshwater ecosystems such as rivers, streams, lakes and ponds. Water is the most important component of beaver habitat; they swim and dive in it, and it provides them refuge from land predators. Fish-eating birds use beaver ponds for foraging, and in some areas, certain species appear more frequently at sites where beavers were active than at sites with no beaver activity. In a study of Wyoming streams and rivers, watercourses with beavers had 75 times as many ducks as those without. As trees are drowned by rising beaver impoundments, they become an ideal habitat for woodpeckers, which carve cavities that may be later used by other bird species. Beaver-caused ice thawing in northern latitudes allows Canada geese to nest earlier.",
+    "confidence_label": "Medium",
+    "confidence_score": 0.69,
+    "sources": [
+      {
+        "title": "Beaver",
+        "source": "https://en.wikipedia.org/wiki/Beaver",
+        "score": 0.692
+      }
+    ],
+    "retrieval_time": 0.078,
+    "generation_time": 20.933,
+    "total_time": 21.015
+  }
+]
